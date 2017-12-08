@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 
-#define TEST 1
+#define TEST 0
 
 // REGEX helpers
 // with leaves "^([a-z]+) \((\d+)\)( -> )([a-z]+)(, [a-z]+)*$"
@@ -50,7 +50,7 @@ std::vector<std::string> Split(std::string to_split, const std::string &delimite
 }
 
 std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> programs) {
-	std::map<std::string, ProgInfo> leaves, tree;
+	std::map<std::string, ProgInfo> tree;
 	std::vector<BranchInfo> branches;
 	unsigned int idx = 0;
 	std::smatch sm;
@@ -58,11 +58,8 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 	std::regex branch_template("^([a-z]+) \\((\\d+)\\)( -> )([a-z]+)(, [a-z]+)*$");
 	std::regex leaves_template("^.* -> (.*)$");
 
-	leaves.clear();
 	tree.clear();
 	branches.clear();
-	// while (programs.size())
-	// idx %= programs.size();
 
 	while (idx < programs.size()) {
 		if (regex_match(programs[idx], sm, leave_template)) {
@@ -70,7 +67,7 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 
 			pi.name = sm.str(1);
 			pi.weight = stoi(sm.str(2));
-			leaves[pi.name] = pi;
+			tree[pi.name] = pi;
 			programs.erase(programs.begin() + idx);
 		} else {
 			idx++;
@@ -92,19 +89,38 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 	}
 
 	idx = 0;
-	while (branches.size()){
+	while (branches.size()) {
 		bool branch_complete = true;
-		for (int i = 0; i < branches[idx].leaves_names.size();i++) {
+		
+		idx %= branches.size();
+
+		for (unsigned int i = 0; i < branches[idx].leaves_names.size(); i++) {
 			std::map<std::string, ProgInfo>::iterator it;
 
-			it = leaves.find(branches[idx].leaves_names[i]);
-			if (it == leaves.end()) {
+			it = tree.find(branches[idx].leaves_names[i]);
+			if (it == tree.end()) {
 				branch_complete = false;
 				break;
 			}
 		}
 		if (branch_complete) {
-			
+			ProgInfo pi;
+
+			pi.name = branches[idx].name;
+			pi.weight = branches[idx].weight;
+			pi.leaves.clear();
+
+			for (unsigned int i = 0; i < branches[idx].leaves_names.size(); i++) {
+				std::string n;
+				n = branches[idx].leaves_names[i];
+
+				pi.leaves[n] = tree[n];
+				tree.erase(n);
+			}
+			tree[pi.name] = pi;
+			branches.erase(branches.begin() + idx);
+		} else {
+			idx++;
 		}
 	}
 
@@ -112,10 +128,11 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 }
 
 int main(void) {
-	int result1 = 0, result2 = 0;
+	int result2 = 0;
 	std::ifstream input;
-	std::string line;
+	std::string line, result1;
 	std::vector<std::string> programs;
+	std::map<std::string, ProgInfo> tree;
 
 	std::cout << "=== Advent of Code 2017 - day 7 ====" << std::endl;
 	std::cout << "--- part 1 ---" << std::endl;
@@ -131,7 +148,10 @@ int main(void) {
 		return -1;
 	}
 
+	result1.clear();
 	programs.clear();
+	tree.clear();
+
 	while (std::getline(input, line)) {
 		programs.push_back(line);
 	}
@@ -140,7 +160,13 @@ int main(void) {
 		input.close();
 	}
 
-	BuildProgramsTree(programs);
+	tree = BuildProgramsTree(programs);
+
+	if (tree.size() == 1) {
+		result1 = tree.begin()->second.name;
+	} else {
+		result1 = "Something has failed";
+	}
 
 	std::cout << "Result is " << result1 << std::endl;
 	std::cout << "--- part 2 ---" << std::endl;
