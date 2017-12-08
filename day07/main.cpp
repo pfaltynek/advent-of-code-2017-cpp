@@ -10,14 +10,10 @@
 
 #define TEST 0
 
-// REGEX helpers
-// with leaves "^([a-z]+) \((\d+)\)( -> )([a-z]+)(, [a-z]+)*$"
-// last leave "^([a-z]+) \((\d+)\)$"
-
 class ProgInfo {
   public:
 	std::string name;
-	int weight;
+	int weight, leaves_weight;
 	std::map<std::string, ProgInfo> leaves;
 };
 
@@ -67,6 +63,7 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 
 			pi.name = sm.str(1);
 			pi.weight = stoi(sm.str(2));
+			pi.leaves_weight = 0;
 			tree[pi.name] = pi;
 			programs.erase(programs.begin() + idx);
 		} else {
@@ -109,12 +106,14 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 			pi.name = branches[idx].name;
 			pi.weight = branches[idx].weight;
 			pi.leaves.clear();
+			pi.leaves_weight = 0;
 
 			for (unsigned int i = 0; i < branches[idx].leaves_names.size(); i++) {
 				std::string n;
 				n = branches[idx].leaves_names[i];
 
 				pi.leaves[n] = tree[n];
+				pi.leaves_weight += tree[n].weight + tree[n].leaves_weight;
 				tree.erase(n);
 			}
 			tree[pi.name] = pi;
@@ -125,6 +124,30 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 	}
 
 	return tree;
+}
+
+int GetRequiredBallancedWeight(const std::map<std::string, ProgInfo> tree) {
+	int max = 0, ballanced = 0, val, max_weight = 0;
+	//std::map<std::string, ProgInfo>::iterator it;
+
+	for (auto it = tree.begin(); it != tree.end(); it++) {
+		val = it->second.weight + it->second.leaves_weight;
+		if (it == tree.begin()){
+			ballanced = val;
+			max = val;
+			max_weight = it->second.weight;
+		} else {
+			if (val > max) {
+				max = val;
+				max_weight = it->second.weight;
+			}
+			if (val < max) {
+				ballanced = val;
+			}
+		}
+	}
+
+	return max_weight - max + ballanced;
 }
 
 int main(void) {
@@ -164,6 +187,7 @@ int main(void) {
 
 	if (tree.size() == 1) {
 		result1 = tree.begin()->second.name;
+		result2 = GetRequiredBallancedWeight(tree.begin()->second.leaves);
 	} else {
 		result1 = "Something has failed";
 	}
