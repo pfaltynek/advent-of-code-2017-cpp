@@ -55,6 +55,7 @@
             "defines": [
                 "_DEBUG",
                 "UNICODE",
+                "WIN32",
 				"__GNUC__"
             ],
             "intelliSenseMode": "msvc-x64",

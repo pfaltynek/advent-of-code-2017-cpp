@@ -13,7 +13,7 @@
 class ProgInfo {
   public:
 	std::string name;
-	int weight, leaves_weight;
+	int weight, weight_leaves;
 	std::map<std::string, ProgInfo> leaves;
 };
 
@@ -63,7 +63,7 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 
 			pi.name = sm.str(1);
 			pi.weight = stoi(sm.str(2));
-			pi.leaves_weight = 0;
+			pi.weight_leaves = 0;
 			tree[pi.name] = pi;
 			programs.erase(programs.begin() + idx);
 		} else {
@@ -88,7 +88,7 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 	idx = 0;
 	while (branches.size()) {
 		bool branch_complete = true;
-		
+
 		idx %= branches.size();
 
 		for (unsigned int i = 0; i < branches[idx].leaves_names.size(); i++) {
@@ -105,15 +105,15 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 
 			pi.name = branches[idx].name;
 			pi.weight = branches[idx].weight;
+			pi.weight_leaves = 0;
 			pi.leaves.clear();
-			pi.leaves_weight = 0;
 
 			for (unsigned int i = 0; i < branches[idx].leaves_names.size(); i++) {
 				std::string n;
 				n = branches[idx].leaves_names[i];
 
 				pi.leaves[n] = tree[n];
-				pi.leaves_weight += tree[n].weight + tree[n].leaves_weight;
+				pi.weight_leaves += tree[n].weight + tree[n].weight_leaves;
 				tree.erase(n);
 			}
 			tree[pi.name] = pi;
@@ -126,32 +126,34 @@ std::map<std::string, ProgInfo> BuildProgramsTree(std::vector<std::string> progr
 	return tree;
 }
 
-int GetRequiredBallancedWeight(const std::map<std::string, ProgInfo> tree) {
-	int max = 0, ballanced = 0, val, max_weight = 0;
-	//std::map<std::string, ProgInfo>::iterator it;
+void GetRequiredBallancedWeight(ProgInfo tree_root, int &result, int diff) {
+	int ballanced = 0, overload = 0, sum;
+	ProgInfo imbalanced;
 
-	for (auto it = tree.begin(); it != tree.end(); it++) {
-		val = it->second.weight + it->second.leaves_weight;
-		if (it == tree.begin()){
-			ballanced = val;
-			max = val;
-			max_weight = it->second.weight;
+	for (auto it = tree_root.leaves.begin(); it != tree_root.leaves.end(); it++) {
+		sum = it->second.weight + it->second.weight_leaves;
+		if (it == tree_root.leaves.begin()) {
+			ballanced = overload = sum;
+			imbalanced = it->second;
 		} else {
-			if (val > max) {
-				max = val;
-				max_weight = it->second.weight;
+			if (sum > ballanced){
+				overload = sum;
+				imbalanced = it->second;
 			}
-			if (val < max) {
-				ballanced = val;
+			if (sum < ballanced){
+				ballanced = sum;
 			}
 		}
 	}
-
-	return max_weight - max + ballanced;
+	if (ballanced != overload){
+		GetRequiredBallancedWeight(imbalanced, result, overload - ballanced);
+	} else {
+		result = tree_root.weight - diff;
+	}
 }
 
 int main(void) {
-	int result2 = 0;
+	int result2 = 0, sum = 0;
 	std::ifstream input;
 	std::string line, result1;
 	std::vector<std::string> programs;
@@ -187,7 +189,7 @@ int main(void) {
 
 	if (tree.size() == 1) {
 		result1 = tree.begin()->second.name;
-		result2 = GetRequiredBallancedWeight(tree.begin()->second.leaves);
+		GetRequiredBallancedWeight(tree.begin()->second, result2, sum);
 	} else {
 		result1 = "Something has failed";
 	}
