@@ -6,24 +6,75 @@
 #include <string>
 #include <vector>
 
-#define TEST 1
+#define TEST 0
 
 std::regex line_template("^(\\d+) <-> (\\d+)(, \\d+)*$");
 std::regex parts_template("^(\\d+) <-> (.+)$");
 
+std::vector<int> Split(std::string to_split, const std::string &delimiter) {
+	std::vector<int> result;
+	size_t pos;
+
+	result.clear();
+
+	pos = to_split.find(delimiter, 0);
+	while (pos != std::string::npos) {
+		if (pos) {
+			result.push_back(stoi(to_split.substr(0, pos)));
+		}
+		to_split = to_split.substr(pos + delimiter.size(), std::string::npos);
+
+		pos = to_split.find(delimiter, 0);
+	}
+
+	if (to_split.size()) {
+		result.push_back(stoi(to_split));
+	}
+
+	return result;
+}
+
 bool ParseLine(std::string line, std::map<int, std::vector<int>> &programs) {
 	std::smatch sm;
 	int prog;
-	
+
 	if (!regex_match(line, sm, line_template)) {
 		return false;
+	} else {
+		regex_match(line, sm, parts_template);
 	}
+
+	prog = stoi(sm.str(1));
+
+	programs[prog] = Split(sm.str(2), ", ");
 
 	return true;
 }
 
+int GetProgGroupSize(int prg_grp_id, std::map<int, std::vector<int>> progs) {
+	std::vector<int> group, queue;
+	int id;
+
+	group.clear();
+	queue.clear();
+	queue.push_back(prg_grp_id);
+
+	while (queue.size()) {
+		id = queue.back();
+		queue.pop_back();
+		if (std::find(group.begin(), group.end(), id) == group.end()) {
+			group.push_back(id);
+			for (unsigned int i = 0; i < progs[id].size(); i++) {
+				queue.push_back(progs[id][i]);
+			}
+		}
+	}
+
+	return group.size();
+}
+
 int main(void) {
-	int result1 = 0, result2 = 0;
+	int result1 = 0, result2 = 0, cnt = 0;
 	std::ifstream input;
 	std::string line;
 	std::map<int, std::vector<int>> programs;
@@ -43,13 +94,17 @@ int main(void) {
 	}
 
 	while (std::getline(input, line)) {
-		if (ParseLine(line, programs)) {
+		cnt++;
+		if (!ParseLine(line, programs)) {
+			std::cout << "Invalid program info on line " << cnt << std::endl;
 		}
 	}
 
 	if (input.is_open()) {
 		input.close();
 	}
+
+	result1 = GetProgGroupSize(0, programs);
 
 	std::cout << "Result is " << result1 << std::endl;
 	std::cout << "--- part 2 ---" << std::endl;
