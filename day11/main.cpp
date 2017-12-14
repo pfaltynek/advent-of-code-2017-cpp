@@ -9,22 +9,6 @@
 // hexagon grids implemntation theory ...
 // https://www.redblobgames.com/grids/hexagons/
 
-#define TEST 0
-
-/*
-class Hex{
-	public:
-	  int GetX(){
-		  return _x;
-	  };
-	  Hex(int x, int y, int z){
-		assert (x + y + z == 0);
-	  };
-
-	private:
-	  int _x, _y_, _z;
-};*/
-
 typedef enum { N, S, NE, NW, SE, SW } HexWay;
 
 bool IsHexWay(std::string input, HexWay &hex_way) {
@@ -188,11 +172,7 @@ int main(void) {
 	std::cout << "=== Advent of Code 2017 - day 11 ====" << std::endl;
 	std::cout << "--- part 1 ---" << std::endl;
 
-#if TEST
-	input.open("input-test.txt", std::ifstream::in);
-#else
 	input.open("input.txt", std::ifstream::in);
-#endif
 
 	if (input.fail()) {
 		std::cout << "Error opening input file.\n";
