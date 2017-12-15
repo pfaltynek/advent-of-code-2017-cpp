@@ -73,6 +73,45 @@ int GetProgGroupSize(int prg_grp_id, std::map<int, std::vector<int>> progs) {
 	return group.size();
 }
 
+int GetProgGroupsCount(std::map<int, std::vector<int>> progs) {
+	std::vector<int> queue, prg_list, groups;
+	std::vector<int>::iterator itv;
+	int id;
+
+	prg_list.clear();
+	groups.clear();
+
+	for (auto it = progs.begin(); it != progs.end(); it++) {
+		prg_list.push_back(it->first);
+	}
+
+	queue.clear();
+
+	while (prg_list.size()) {
+		queue.push_back(prg_list[0]);
+		groups.push_back(prg_list[0]);
+		prg_list.erase(prg_list.begin());
+
+		while (queue.size()) {
+			id = queue.back();
+			queue.pop_back();
+			itv = std::find(prg_list.begin(), prg_list.end(), id);
+			if (itv != prg_list.end()) {
+				prg_list.erase(itv);
+			}
+			for (unsigned int i = 0; i < progs[id].size(); i++) {
+				if (std::find(prg_list.begin(), prg_list.end(), progs[id][i]) != prg_list.end()) {
+					if (std::find(queue.begin(), queue.end(), progs[id][i]) == queue.end()) {
+						queue.push_back(progs[id][i]);
+					}
+				}
+			}
+		}
+	}
+
+	return groups.size();
+}
+
 int main(void) {
 	int result1 = 0, result2 = 0, cnt = 0;
 	std::ifstream input;
@@ -105,6 +144,7 @@ int main(void) {
 	}
 
 	result1 = GetProgGroupSize(0, programs);
+	result2 = GetProgGroupsCount(programs);
 
 	std::cout << "Result is " << result1 << std::endl;
 	std::cout << "--- part 2 ---" << std::endl;
