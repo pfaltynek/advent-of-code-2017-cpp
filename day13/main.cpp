@@ -21,11 +21,15 @@ class Scanner {
 	int GetState() {
 		return _state;
 	}
+	int GetPeriod() {
+		return _period;
+	}
 	Scanner() {
 		_depth = 0;
-		_range = 1;
+		_range = 2;
 		_state = 0;
 		_down = true;
+		_period = 2;
 	}
 	Scanner(int depth, int range) {
 		Init(depth, range);
@@ -34,6 +38,7 @@ class Scanner {
 		_depth = depth;
 		_range = range;
 		_state = 0;
+		_period = (range - 1) * 2;
 		_down = true;
 	}
 	void Reset() {
@@ -55,7 +60,7 @@ class Scanner {
 	}
 
   private:
-	int _depth, _range, _state;
+	int _depth, _range, _state, _period;
 	bool _down;
 };
 
@@ -83,33 +88,21 @@ int GetDelayToPassFirewall(std::map<int, Scanner> firewall) {
 	}
 
 	while (caught) {
-		for (auto it = firewall.begin(); it != firewall.end(); it++) {
-			it->second.Reset();
-		}
-
-		for (int i = 0; i < delay; i++) {
-			for (auto it = firewall.begin(); it != firewall.end(); it++) {
-				it->second.PicoSecondRunOut();
-			}
-		}
-
 		caught = false;
 
 		for (int i = 0; i <= max; i++) {
 			if (firewall.find(i) != firewall.end()) {
-				if (firewall[i].GetState() == 0) {
+				if (((delay + firewall[i].GetDepth()) % firewall[i].GetPeriod()) == 0) {
 					caught = true;
 					break;
 				}
 			}
-			for (auto it = firewall.begin(); it != firewall.end(); it++) {
-				it->second.PicoSecondRunOut();
-			}
 		}
+
 		delay++;
 	}
 
-	return --delay;
+	return (int)--delay;
 }
 
 int GetFirewallSeverity(std::map<int, Scanner> firewall) {
@@ -124,13 +117,9 @@ int GetFirewallSeverity(std::map<int, Scanner> firewall) {
 
 	for (int i = 0; i <= max; i++) {
 		if (firewall.find(i) != firewall.end()) {
-			if (firewall[i].GetState() == 0) {
+			if ((i % firewall[i].GetPeriod()) == 0) {
 				severity += i * firewall[i].GetRange();
 			}
-		}
-
-		for (auto it = firewall.begin(); it != firewall.end(); it++) {
-			it->second.PicoSecondRunOut();
 		}
 	}
 
