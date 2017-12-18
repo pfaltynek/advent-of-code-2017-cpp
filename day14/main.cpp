@@ -10,6 +10,18 @@
 
 const std::string input("stpzcrnm");
 
+unsigned int GetCoord(unsigned char x, unsigned char y) {
+	return (x * 1000) + y;
+}
+
+unsigned char GetXCoord(unsigned int coord) {
+	return coord / 1000;
+}
+
+unsigned char GetYCoord(unsigned int coord) {
+	return coord % 1000;
+}
+
 std::vector<int> PrepareLengths(std::string input) {
 	std::vector<int> result;
 
@@ -122,47 +134,103 @@ std::vector<unsigned char> GetKnotHash(std::string input) {
 	return GetDenseHash(list);
 }
 
-int GetBitOnCount(std::vector<unsigned char> hash) {
+int GetUsedSectorsCount(std::map<unsigned int, bool> &bit_map) {
 	int result = 0;
-	unsigned char val;
 
-	for (unsigned int i = 0; i < hash.size(); i++) {
-		val = hash[i];
-		for (int j = 0; j < 8; j++) {
-			if (val & 0x01) {
-				result++;
-			}
-			val = val >> 1;
+	for (auto it = bit_map.begin(); it != bit_map.end(); it++) {
+		if (it->second) {
+			result++;
 		}
 	}
 
 	return result;
 }
 
-int GetUsedSectorsCount(std::string input) {
+void FillGridMap(std::string input, std::map<unsigned int, bool> &bit_map) {
 	std::string line;
-	int result = 0;
 	std::vector<unsigned char> hash;
+	unsigned char val, x, y;
+	bool bit;
+	unsigned int coord;
 
-	for (int i = 0; i < 128; i++) {
-		line = input + "-" + std::to_string(i);
+	for (int ii = 0; ii < 128; ii++) {
+		line = input + "-" + std::to_string(ii);
 		hash = GetKnotHash(line);
-		result += GetBitOnCount(hash);
+
+		for (unsigned int i = 0; i < hash.size(); i++) {
+			val = hash[i];
+			for (int j = 0; j < 8; j++) {
+				x = (i * 8) + j;
+				y = ii;
+				coord = GetCoord(x, y);
+				bit = val & 0x80;
+				bit_map[coord] = bit;
+				val = val << 1;
+			}
+		}
 	}
+}
+
+int GetRegionsCount(std::map<unsigned int, bool> bit_map) {
+	int result = 0;
+	std::vector<unsigned int> queue;
+	bool in_region = false, state;
+	unsigned int coord;
+	unsigned char x, y;
+
+	while (bit_map.size()) {
+
+		queue.push_back(bit_map.begin()->first);
+
+		while (queue.size()) {
+			coord = queue.back();
+			queue.pop_back();
+			x = GetXCoord(coord);
+			y = GetYCoord(coord);
+
+			if (bit_map.find(coord) == bit_map.end()) {
+				state = false;
+			} else {
+				state = bit_map[coord];
+			}
+
+			if (state) {
+				if (!in_region) {
+					in_region = true;
+					result++;
+				}
+
+				queue.push_back(GetCoord(x + 1, y));
+				queue.push_back(GetCoord(x - 1, y));
+				queue.push_back(GetCoord(x, y + 1));
+				queue.push_back(GetCoord(x, y - 1));
+			}
+
+			bit_map.erase(coord);
+		}
+		in_region = false;
+	}
+
 	return result;
 }
 
 int main(void) {
 	int result1 = 0, result2 = 0;
+	std::map<unsigned int, bool> bit_map;
 
 	std::cout << "=== Advent of Code 2017 - day 14 ====" << std::endl;
 	std::cout << "--- part 1 ---" << std::endl;
 
+	bit_map.clear();
+
 #if TEST
-	result1 = GetUsedSectorsCount("flqrgnkx");
+	FillGridMap("flqrgnkx", bit_map);
 #else
-	result1 = GetUsedSectorsCount(input);
+	FillGridMap(input, bit_map);
 #endif
+
+	result1 = GetUsedSectorsCount(bit_map);
+	result2 = GetRegionsCount(bit_map);
 
 	std::cout << "Result is " << result1 << std::endl;
 	std::cout << "--- part 2 ---" << std::endl;
