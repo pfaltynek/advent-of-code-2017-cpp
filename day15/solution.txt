@@ -1,2 +1,2 @@
-part1:	
-part2:	
+part1:	573
+part2:	294
