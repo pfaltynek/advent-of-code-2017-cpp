@@ -4,7 +4,7 @@
 	"version": "2.0.0",
 	"tasks": [
 		{
-			"label": "build AoC 2017 day 15",
+			"label": "build AoC 2017 day 16",
 			"type": "shell",
 			"command": "g++",
 			"args": [
@@ -13,7 +13,7 @@
 				"-Wall",
 				"main.cpp",
 				"-o",
-				"aoc-2017-day15",
+				"aoc-2017-day16",
 				"-D_GLIBCXX_DEBUG"
 			],
 			"group": {
