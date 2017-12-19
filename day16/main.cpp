@@ -15,8 +15,8 @@
 #endif
 
 std::regex spin_template("^s(\\d+)$");
-std::regex swap_by_idx_template("^x(\\d+)\/(\\d+)$");
-std::regex swap_by_name_template("^p([a-p])\/([a-p])$");
+std::regex swap_by_idx_template("^x(\\d+)\\/(\\d+)$");
+std::regex swap_by_name_template("^p([a-p])\\/([a-p])$");
 
 std::vector<std::string> Split(std::string to_split, const std::string &delimiter) {
 	std::vector<std::string> result;
