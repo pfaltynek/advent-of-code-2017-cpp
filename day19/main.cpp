@@ -12,11 +12,11 @@ int GetCoord(int row, int col) {
 	return (1000 * row) + col;
 }
 
-int GetRowCoord(int coord){
+int GetRowCoord(int coord) {
 	return coord / 1000;
 }
 
-int GetColCoord(int coord){
+int GetColCoord(int coord) {
 	return coord % 1000;
 }
 
@@ -41,12 +41,67 @@ void BuildTubesMap(std::string line, std::map<int, char> &tubes, int &start_coor
 	}
 }
 
-void ExploreTubes(const int start_coord, const std::map<int, char> &tubes, std::string &result) {
+void ExploreTubes(const int start_coord, std::map<int, char> tubes, std::string &result) {
 	result.clear();
-	char way = 0; //0 - down, 1 - right, 2 - up, 3 - left
-	int coord, r, c;
+	char way = 0, way1, way2; // 0 - down, 1 - right, 2 - up, 3 - left
+	int coord, r, c, turn1, turn2;
+	bool finished = false;
 
-	
+	coord = start_coord;
+
+	while (!finished) {
+		r = GetRowCoord(coord);
+		c = GetColCoord(coord);
+
+		if (tubes[coord] == '+') {
+			switch (way) {
+				case 0: // down
+				case 2: // up
+					turn1 = GetCoord(r, c - 1);
+					way1 = 3; // left
+					turn2 = GetCoord(r, c + 1);
+					way2 = 1; // right
+					break;
+				case 1: // right
+				case 3: // left
+					turn1 = GetCoord(r - 1, c);
+					way1 = 2; // up
+					turn2 = GetCoord(r + 1, c);
+					way2 = 0; // down
+					break;
+			}
+			if (tubes.find(turn1) != tubes.end()) {
+				coord = turn1;
+				way = way1;
+			} else if (tubes.find(turn2) != tubes.end()) {
+				coord = turn2;
+				way = way2;
+			} else {
+				finished = true;
+			}
+		} else {
+			if ((tubes[coord] >= 'A') && (tubes[coord] <= 'Z')) {
+				result += tubes[coord];
+			}
+
+			switch (way) {
+				case 0: // down
+					coord = GetCoord(r + 1, c);
+					break;
+				case 1: // right
+					coord = GetCoord(r, c + 1);
+					break;
+				case 2: // up
+					coord = GetCoord(r - 1, c);
+					break;
+				case 3: // left
+					coord = GetCoord(r, c - 1);
+					break;
+			}
+
+			finished = (tubes.find(coord) == tubes.end());
+		}
+	}
 }
 
 int main(void) {
