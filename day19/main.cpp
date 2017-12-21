@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-#define TEST 1
+#define TEST 0
 
 int GetCoord(int row, int col) {
 	return (1000 * row) + col;
@@ -41,12 +41,13 @@ void BuildTubesMap(std::string line, std::map<int, char> &tubes, int &start_coor
 	}
 }
 
-void ExploreTubes(const int start_coord, std::map<int, char> tubes, std::string &result) {
-	result.clear();
+void ExploreTubes(const int start_coord, std::map<int, char> tubes, std::string &result1, int&result2) {
 	char way = 0, way1, way2; // 0 - down, 1 - right, 2 - up, 3 - left
 	int coord, r, c, turn1, turn2;
 	bool finished = false;
 
+	result1.clear();
+	result2 = 0;
 	coord = start_coord;
 
 	while (!finished) {
@@ -81,7 +82,7 @@ void ExploreTubes(const int start_coord, std::map<int, char> tubes, std::string 
 			}
 		} else {
 			if ((tubes[coord] >= 'A') && (tubes[coord] <= 'Z')) {
-				result += tubes[coord];
+				result1 += tubes[coord];
 			}
 
 			switch (way) {
@@ -101,13 +102,14 @@ void ExploreTubes(const int start_coord, std::map<int, char> tubes, std::string 
 
 			finished = (tubes.find(coord) == tubes.end());
 		}
+		result2++;
 	}
 }
 
 int main(void) {
-	int cnt = 0, result1 = 0, result2 = 0;
+	int cnt = 0, result2 = 0;
 	std::ifstream input;
-	std::string line;
+	std::string line, result1;
 	std::map<int, char> tubes;
 	std::cout << "=== Advent of Code 2017 - day 19 ====" << std::endl;
 	std::cout << "--- part 1 ---" << std::endl;
@@ -134,6 +136,8 @@ int main(void) {
 	if (input.is_open()) {
 		input.close();
 	}
+
+	ExploreTubes(start_coord, tubes, result1, result2);
 
 	std::cout << "Result is " << result1 << std::endl;
 	std::cout << "--- part 2 ---" << std::endl;
