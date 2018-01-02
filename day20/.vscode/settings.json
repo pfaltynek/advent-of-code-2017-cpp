@@ -6,6 +6,7 @@
 		"ostream": "cpp",
 		"array": "cpp",
 		"bitset": "cpp",
-		"utility": "cpp"
+		"utility": "cpp",
+		"cstdlib": "cpp"
 	}
 }
