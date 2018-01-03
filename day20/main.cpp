@@ -6,9 +6,7 @@
 #include <string>
 #include <vector>
 
-#define TEST 0
-
-std::regex particle_template("p=<(-?\\d+),(-?\\d+),(-?\\d+)>, v=<(-?\\d+),(-?\\d+),(-?\\d+)>, a=<(-?\\d+),(-?\\d+),(-?\\d+)>");
+std::regex particle_template("^p=<(-?\\d+),(-?\\d+),(-?\\d+)>, v=<(-?\\d+),(-?\\d+),(-?\\d+)>, a=<(-?\\d+),(-?\\d+),(-?\\d+)>$");
 
 typedef struct {
 	long long x, y, z;
@@ -136,11 +134,7 @@ int main(void) {
 	std::cout << "--- part 1 ---" << std::endl;
 	particle part;
 
-#if TEST
-	input.open("input-test.txt", std::ifstream::in);
-#else
 	input.open("input.txt", std::ifstream::in);
-#endif
 
 	if (input.fail()) {
 		std::cout << "Error opening input file.\n";
@@ -163,9 +157,12 @@ int main(void) {
 	}
 
 	result1 = GetClosestParticle(particles, 10000);
-	result2 = ClearCollisions(particles);
 
 	std::cout << "Result is " << result1 << std::endl;
+
 	std::cout << "--- part 2 ---" << std::endl;
+
+	result2 = ClearCollisions(particles);
+
 	std::cout << "Result is " << result2 << std::endl;
 }
