@@ -7,9 +7,9 @@
 #include <string>
 #include <vector>
 
-#define TEST 0
+#define TEST 1
 
-std::string EncodePosition(int x, int y) {
+std::string EncodePosition(long long x, long long y) {
 	std::string result;
 
 	result.clear();
@@ -20,7 +20,7 @@ std::string EncodePosition(int x, int y) {
 	return result;
 }
 
-bool ParseGrid(std::vector<std::string> grid_input, std::vector<std::string> &grid, int &line) {
+bool ParseGrid(std::vector<std::string> grid_input, std::map<std::string, char> &grid, int &line) {
 	unsigned int size;
 	size = grid_input.size();
 
@@ -33,7 +33,7 @@ bool ParseGrid(std::vector<std::string> grid_input, std::vector<std::string> &gr
 		}
 		for (unsigned int j = 0; j < size; ++j) {
 			if (grid_input[i][j] == '#') {
-				grid.push_back(EncodePosition(j, i));
+				grid[EncodePosition(j, i)] = '#';
 			}
 		}
 	}
@@ -41,75 +41,157 @@ bool ParseGrid(std::vector<std::string> grid_input, std::vector<std::string> &gr
 	return true;
 }
 
-int CalculateInfections(std::vector<std::string> grid, int grid_size, unsigned int bursts) {
-	int result = 0, x, y, xdiff, ydiff;
+int CalculateInfections(std::map<std::string, char> grid, int grid_size, unsigned int bursts, bool is_part1) {
+	int result = 0, xdiff, ydiff;
+	long long x, y;
 	unsigned char facing = 0; // up, 1 => right, 2 => down, 3 => left
-	std::vector<std::string>::iterator it;
 	std::string pos;
 	x = y = grid_size / 2;
 
 	for (unsigned int i = 0; i < bursts; ++i) {
 		pos = EncodePosition(x, y);
-		it = std::find(grid.begin(), grid.end(), pos);
 
-		if (it != grid.end()) {
-			grid.erase(it);
-			switch (facing) { // turning to right
-				case 0:		  // up
-					xdiff = 1;
-					ydiff = 0;
-					facing = 1;
-					break;
-				case 1: // right
-					xdiff = 0;
-					ydiff = 1;
-					facing = 2;
-					break;
-				case 2: // down
-					xdiff = -1;
-					ydiff = 0;
-					facing = 3;
-					break;
-				case 3: // left
-					xdiff = 0;
-					ydiff = -1;
-					facing = 0;
-					break;
-				default:
-					xdiff = ydiff = 0;
-					break;
-			}
-		} else {
-			grid.push_back(pos);
-
-			result++;
-
-			switch (facing) { // turning to left
-				case 0:		  // up
-					xdiff = -1;
-					ydiff = 0;
-					facing = 3;
-					break;
-				case 1: // right
-					xdiff = 0;
-					ydiff = -1;
-					facing = 0;
-					break;
-				case 2: // down
-					xdiff = 1;
-					ydiff = 0;
-					facing = 1;
-					break;
-				case 3: // left
-					xdiff = 0;
-					ydiff = 1;
-					facing = 2;
-					break;
-				default:
-					xdiff = ydiff = 0;
-					break;
-			}
+		if (grid.find(pos) == grid.end()) {
+			grid[pos] = '.';
 		}
+
+		switch (grid[pos]) {
+			case '#':
+				if (is_part1) {
+					grid[pos] = '.';
+				} else {
+					grid[pos] = 'F';
+				}
+
+				switch (facing) { // turning to right
+					case 0:		  // up
+						xdiff = 1;
+						ydiff = 0;
+						facing = 1;
+						break;
+					case 1: // right
+						xdiff = 0;
+						ydiff = 1;
+						facing = 2;
+						break;
+					case 2: // down
+						xdiff = -1;
+						ydiff = 0;
+						facing = 3;
+						break;
+					case 3: // left
+						xdiff = 0;
+						ydiff = -1;
+						facing = 0;
+						break;
+					default:
+						xdiff = ydiff = 0;
+						break;
+				}
+				break;
+			case '.':
+				if (is_part1) {
+					grid[pos] = '#';
+					result++;
+				} else {
+					grid[pos] = 'W';
+				}
+
+				switch (facing) { // turning to left
+					case 0:		  // up
+						xdiff = -1;
+						ydiff = 0;
+						facing = 3;
+						break;
+					case 1: // right
+						xdiff = 0;
+						ydiff = -1;
+						facing = 0;
+						break;
+					case 2: // down
+						xdiff = 1;
+						ydiff = 0;
+						facing = 1;
+						break;
+					case 3: // left
+						xdiff = 0;
+						ydiff = 1;
+						facing = 2;
+						break;
+					default:
+						xdiff = ydiff = 0;
+						break;
+				}
+				break;
+			case 'W':
+				if (is_part1) {
+					// not possible
+					int zzzz = 111;
+					break;
+				} else {
+					grid[pos] = '#';
+				}
+
+				switch (facing) { // continue in previous way
+					case 0:		  // up
+						xdiff = 0;
+						ydiff = -1;
+						break;
+					case 1: // right
+						xdiff = 1;
+						ydiff = 0;
+						break;
+					case 2: // down
+						xdiff = 0;
+						ydiff = 1;
+						break;
+					case 3: // left
+						xdiff = -1;
+						ydiff = 0;
+						break;
+					default:
+						xdiff = ydiff = 0;
+						break;
+				}
+				break;
+			case 'F':
+				if (is_part1) {
+					// not possible
+					int zzzz = 111;
+					break;
+				} else {
+					grid[pos] = '.';
+				}
+
+				switch (facing) { // reverse way
+					case 0:		  // up
+						xdiff = 0;
+						ydiff = 1;
+						break;
+					case 1: // right
+						xdiff = -1;
+						ydiff = 0;
+						break;
+					case 2: // down
+						xdiff = 0;
+						ydiff = -1;
+						break;
+					case 3: // left
+						xdiff = 1;
+						ydiff = 0;
+						break;
+					default:
+						xdiff = ydiff = 0;
+						break;
+				}
+				facing = (facing + 2) % 4;
+				break;
+			default:
+				// problem?
+				int xx = 115;
+				break;
+		}
+
 		x += xdiff;
 		y += ydiff;
 	}
@@ -121,7 +203,8 @@ int main(void) {
 	int cnt = 0, result1 = 0, result2 = 0;
 	std::ifstream input;
 	std::string line;
-	std::vector<std::string> grid_input, grid;
+	std::vector<std::string> grid_input;
+	std::map<std::string, char> grid;
 
 	std::cout << "=== Advent of Code 2017 - day 22 ====" << std::endl;
 	std::cout << "--- part 1 ---" << std::endl;
@@ -150,10 +233,18 @@ int main(void) {
 	if (input.is_open()) {
 		input.close();
 	}
+/*
+#if TEST
+	result1 = CalculateInfections(grid, grid_input.size(), 7, true);
+	result1 = CalculateInfections(grid, grid_input.size(), 70, true);
+#endif
 
-	result1 = CalculateInfections(grid, grid_input.size(), 10000);
+	result1 = CalculateInfections(grid, grid_input.size(), 10000, true);
+*/
 	std::cout << "Result is " << result1 << std::endl;
 	std::cout << "--- part 2 ---" << std::endl;
+
+	result2 = CalculateInfections(grid, grid_input.size(), 10000, false);
 
 	std::cout << "Result is " << result2 << std::endl;
 }
