@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#define TEST 1
+#define TEST 0
 
 std::string EncodePosition(long long x, long long y) {
 	std::string result;
@@ -41,14 +41,14 @@ bool ParseGrid(std::vector<std::string> grid_input, std::map<std::string, char> 
 	return true;
 }
 
-int CalculateInfections(std::map<std::string, char> grid, int grid_size, unsigned int bursts, bool is_part1) {
-	int result = 0, xdiff, ydiff;
-	long long x, y;
+long long CalculateInfections(std::map<std::string, char> grid, int grid_size, long long bursts, bool is_part1) {
+	long long result = 0, x, y,xdiff, ydiff;
 	unsigned char facing = 0; // up, 1 => right, 2 => down, 3 => left
 	std::string pos;
+
 	x = y = grid_size / 2;
 
-	for (unsigned int i = 0; i < bursts; ++i) {
+	for (long long i = 0; i < bursts; ++i) {
 		pos = EncodePosition(x, y);
 
 		if (grid.find(pos) == grid.end()) {
@@ -130,6 +130,7 @@ int CalculateInfections(std::map<std::string, char> grid, int grid_size, unsigne
 					break;
 				} else {
 					grid[pos] = '#';
+					result++;
 				}
 
 				switch (facing) { // continue in previous way
@@ -200,7 +201,8 @@ int CalculateInfections(std::map<std::string, char> grid, int grid_size, unsigne
 }
 
 int main(void) {
-	int cnt = 0, result1 = 0, result2 = 0;
+	int cnt = 0;
+	long long result1 = 0, result2 = 0;
 	std::ifstream input;
 	std::string line;
 	std::vector<std::string> grid_input;
@@ -233,18 +235,21 @@ int main(void) {
 	if (input.is_open()) {
 		input.close();
 	}
-/*
-#if TEST
-	result1 = CalculateInfections(grid, grid_input.size(), 7, true);
-	result1 = CalculateInfections(grid, grid_input.size(), 70, true);
-#endif
+
+	#if TEST
+		result1 = CalculateInfections(grid, grid_input.size(), 7, true);// 5
+		result1 = CalculateInfections(grid, grid_input.size(), 70, true);// 41
+	#endif
 
 	result1 = CalculateInfections(grid, grid_input.size(), 10000, true);
-*/
+
 	std::cout << "Result is " << result1 << std::endl;
 	std::cout << "--- part 2 ---" << std::endl;
 
-	result2 = CalculateInfections(grid, grid_input.size(), 10000, false);
+#if TEST
+	result2 = CalculateInfections(grid, grid_input.size(), 100, false);		 // 26
+#endif
+	result2 = CalculateInfections(grid, grid_input.size(), 10000000, false); // in test 2511944
 
 	std::cout << "Result is " << result2 << std::endl;
 }
