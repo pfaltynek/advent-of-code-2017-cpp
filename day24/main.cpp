@@ -11,15 +11,15 @@
 
 std::regex component_template("^(\\d+)\\/(\\d+)$");
 
-void AddEmptyListIfNeeded(std::map<int, std::vector<int>> &components, int val) {
+void AddEmptyListIfNeeded(std::map<int, std::map<int, std::string>> &components, int val) {
 	if (components.find(val) == components.end()) {
-		std::vector<int> list;
+		std::map<int, std::string> list;
 		list.clear();
 		components[val] = list;
 	}
 }
 
-bool ParseComponent(std::string line, std::map<int, std::vector<int>> &components) {
+bool ParseComponent(std::string line, std::map<int, std::map<int, std::string>> &components) {
 	std::smatch sm;
 
 	if (std::regex_match(line, sm, component_template)) {
@@ -28,8 +28,8 @@ bool ParseComponent(std::string line, std::map<int, std::vector<int>> &component
 		r = stoi(sm.str(2));
 		AddEmptyListIfNeeded(components, l);
 		AddEmptyListIfNeeded(components, r);
-		components[l].push_back(r);
-		components[r].push_back(l);
+		components[l][r] = line;
+		components[r][l] = line;
 		return true;
 	} else {
 		return false;
@@ -41,6 +41,7 @@ int main(void) {
 	int result1 = 0, result2 = 0;
 	std::ifstream input;
 	std::string line;
+	std::map<int, std::map<int, std::string>> components;
 
 	std::cout << "=== Advent of Code 2017 - day 24 ====" << std::endl;
 	std::cout << "--- part 1 ---" << std::endl;
@@ -56,12 +57,13 @@ int main(void) {
 		return -1;
 	}
 
-	while (std::getline(input, line)) {
-		grid_input.push_back(line);
-	}
+	components.clear();
 
-	if (!ParseGrid(grid_input, grid, cnt)) {
-		std::cout << "Unable to decode grid map at line " << cnt << std::endl;
+	while (std::getline(input, line)) {
+		cnt++;
+		if (!ParseComponent(line, components)) {
+			std::cout << "Unable to decode grid map at line " << cnt << std::endl;
+		}
 	}
 
 	if (input.is_open()) {
