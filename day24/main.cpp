@@ -74,8 +74,10 @@ void FindStrongestBridge(std::vector<component> &bridge, std::map<int, std::map<
 				if (sn > result1) {
 					result1 = sn;
 				}
-				if (longest <= bn.size()) {
+				if (longest < bn.size()) {
 					longest = bn.size();
+					result2 = sn;
+				} else if ((longest == bn.size()) && (result2 < sn)) {
 					result2 = sn;
 				}
 				FindStrongestBridge(bn, cn, sn, longest, result1, result2);
