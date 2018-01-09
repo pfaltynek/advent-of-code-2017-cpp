@@ -25,7 +25,7 @@ void AddEmptyListIfNeeded(std::map<int, std::map<int, component>> &components, i
 	}
 }
 
-bool ParseComponent(std::string line, std::map<int, std::map<int, component>> &components) {
+bool ParseComponent(std::string line, std::map<int, std::map<int, component>> &components, std::map<std::string, bool> &components_available) {
 	std::smatch sm;
 
 	if (std::regex_match(line, sm, component_template)) {
@@ -43,44 +43,39 @@ bool ParseComponent(std::string line, std::map<int, std::map<int, component>> &c
 		comp.first = r;
 		comp.second = l;
 		components[r][l] = comp;
+		components_available[line] = true;
 		return true;
 	} else {
 		return false;
 	}
 }
 
-void FindStrongestBridge(std::vector<component> &bridge, std::map<int, std::map<int, component>> &components, int sum, unsigned int &longest, int &result1,
-						 int &result2) {
-	int start;
-
-	if (bridge.size()) {
-		start = bridge.back().second;
-	} else {
-		start = 0;
-	}
+void FindStrongestBridge(int start, std::map<int, std::map<int, component>> &components, std::map<std::string, bool> components_available, int sum, int size,
+						  unsigned int &longest, unsigned int &result1, unsigned int &result2) {
 
 	if (components.find(start) != components.end()) {
-		if (components[start].size()) {
-			for (auto it = components[start].begin(); it != components[start].end(); it++) {
-				std::map<int, std::map<int, component>> cn(components);
-				std::vector<component> bn(bridge);
-				int end = it->second.second;
-				int sn;
+		for (auto it = components[start].begin(); it != components[start].end(); it++) {
+			int end;
+			unsigned int sum_new, size_new;
 
-				sn = sum + start + end;
-				bn.push_back(it->second);
-				cn[start].erase(end);
-				cn[end].erase(start);
-				if (sn > result1) {
-					result1 = sn;
+			if (components_available[it->second.desc]) {
+				end = it->second.second;
+
+				components_available[it->second.desc] = false;
+				sum_new = sum + start + end;
+				size_new = size + 1;
+				if (sum_new > result1) {
+					result1 = sum_new;
 				}
-				if (longest < bn.size()) {
-					longest = bn.size();
-					result2 = sn;
-				} else if ((longest == bn.size()) && (result2 < sn)) {
-					result2 = sn;
+				if (longest < size_new) {
+					longest = size_new;
+					result2 = size_new;
+				} else if ((longest == size_new) && (result2 < sum_new)) {
+					result2 = sum_new;
 				}
-				FindStrongestBridge(bn, cn, sn, longest, result1, result2);
+				FindStrongestBridge(end, components, components_available, sum_new, size_new, longest, result1, result2);
+
+				components_available[it->second.desc] = true;
 			}
 		}
 	}
@@ -88,11 +83,11 @@ void FindStrongestBridge(std::vector<component> &bridge, std::map<int, std::map<
 
 int main(void) {
 	int cnt = 0;
-	int result1 = 0, result2 = 0;
+	unsigned int result1 = 0, result2 = 0;
 	std::ifstream input;
 	std::string line;
 	std::map<int, std::map<int, component>> components;
-	std::vector<component> bridge;
+	std::map<std::string, bool> components_available;
 	unsigned int longest = 0;
 
 	std::cout << "=== Advent of Code 2017 - day 24 ====" << std::endl;
@@ -110,11 +105,11 @@ int main(void) {
 	}
 
 	components.clear();
-	bridge.clear();
+	components_available.clear();
 
 	while (std::getline(input, line)) {
 		cnt++;
-		if (!ParseComponent(line, components)) {
+		if (!ParseComponent(line, components, components_available)) {
 			std::cout << "Unable to decode grid map at line " << cnt << std::endl;
 		}
 	}
@@ -123,7 +118,7 @@ int main(void) {
 		input.close();
 	}
 
-	FindStrongestBridge(bridge, components, 0, longest, result1, result2);
+	FindStrongestBridge(0, components, components_available, 0, 0, longest, result1, result2);
 
 	std::cout << "Result is " << result1 << std::endl;
 	std::cout << "--- part 2 ---" << std::endl;
