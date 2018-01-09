@@ -1,6 +1,5 @@
 #include <fstream>
 #include <iostream>
-#include <string>
 
 int SolveCaptcha1stPart(std::string captcha) {
 	int result = 0;

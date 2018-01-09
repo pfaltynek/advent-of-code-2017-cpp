@@ -1,12 +1,10 @@
 #include <algorithm>
-#include <climits>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string>
 #include <vector>
 
-#define TEST 1
+#define TEST 0
 
 int GetLineChecksum(std::vector<int> line) {
 	return (*(line.begin())) - (*(line.rbegin()));
