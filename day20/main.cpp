@@ -1,9 +1,8 @@
+#include <climits>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <regex>
-#include <sstream>
-#include <string>
 #include <vector>
 
 std::regex particle_template("^p=<(-?\\d+),(-?\\d+),(-?\\d+)>, v=<(-?\\d+),(-?\\d+),(-?\\d+)>, a=<(-?\\d+),(-?\\d+),(-?\\d+)>$");
@@ -50,11 +49,11 @@ void UpdateParticle(particle &part) {
 }
 
 int GetClosestParticle(std::vector<particle> particles, int step) {
-	unsigned long long closest = __LONG_LONG_MAX__, tmp;
+	unsigned long long closest = LLONG_MAX, tmp;
 	int idx = -1, result = -1;
 
 	for (int j = 0; j < step; ++j) {
-		closest = __LONG_LONG_MAX__;
+		closest = LLONG_MAX;
 		idx = -1;
 		for (unsigned int i = 0; i < particles.size(); ++i) {
 			UpdateParticle(particles[i]);

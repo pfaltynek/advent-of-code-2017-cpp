@@ -1,12 +1,11 @@
 #include <iostream>
 #include <map>
 #include <vector>
-#include <cstdlib>
 
 #define TEST 0
 
 typedef struct POSITION {
-	unsigned int x, y;
+	int x, y;
 } POSITION;
 
 const int input = 289326;
@@ -99,7 +98,7 @@ void BuildSpiralMap(int input, int &part1result, unsigned int &part2result) {
 		}
 	}
 
-	part1result = abs(grid[input].x) + abs(grid[input].y);
+	part1result = std::abs(grid[input].x) + std::abs(grid[input].y);
 }
 
 int main(void) {

@@ -1,9 +1,4 @@
-#include <fstream>
 #include <iostream>
-#include <map>
-#include <regex>
-#include <sstream>
-#include <string>
 #include <vector>
 
 #define TEST 0
@@ -33,7 +28,7 @@ int TraceSpinLockPart1() {
 }
 
 long long TraceSpinLockPart2() {
-	long long counter = 1, current = 0, next = 0, result = 0, test = 10000;
+	long long counter = 1, current = 0, next = 0, result = 0;
 
 	while (counter <= 50000000) {
 		next = ((current + STEPS) % (counter)) + 1;

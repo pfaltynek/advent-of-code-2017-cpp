@@ -1,10 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include <map>
 #include <regex>
-#include <sstream>
-#include <string>
-#include <vector>
 
 #define TEST 0
 
@@ -46,7 +42,7 @@ long long GetPairsCount(long long rounds, int startA, int startB) {
 
 long long GetPairs2Count(long long rounds, int startA, int startB) {
 	int a, b;
-	long long result = 0, cnt = 0;
+	long long result = 0;
 
 	a = startA;
 	b = startB;
@@ -107,7 +103,7 @@ int main(void) {
 	}
 
 	if (!genA || !genB) {
-		std::cout << "Incomplette input data" << cnt << std::endl;
+		std::cout << "Incomplette input data" << std::endl;
 		return -1;
 	}
 

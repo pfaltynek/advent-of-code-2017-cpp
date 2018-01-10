@@ -1,10 +1,6 @@
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
-#include <regex>
-#include <sstream>
-#include <string>
 #include <vector>
 
 #define TEST 0
@@ -124,11 +120,7 @@ long long CalculateInfections(std::map<std::string, char> grid, int grid_size, l
 				}
 				break;
 			case 'W':
-				if (is_part1) {
-					// not possible
-					int zzzz = 111;
-					break;
-				} else {
+				if (!is_part1) {
 					grid[pos] = '#';
 					result++;
 				}
@@ -156,11 +148,7 @@ long long CalculateInfections(std::map<std::string, char> grid, int grid_size, l
 				}
 				break;
 			case 'F':
-				if (is_part1) {
-					// not possible
-					int zzzz = 111;
-					break;
-				} else {
+				if (!is_part1) {
 					grid[pos] = '.';
 				}
 
@@ -186,10 +174,6 @@ long long CalculateInfections(std::map<std::string, char> grid, int grid_size, l
 						break;
 				}
 				facing = (facing + 2) % 4;
-				break;
-			default:
-				// problem?
-				int xx = 115;
 				break;
 		}
 

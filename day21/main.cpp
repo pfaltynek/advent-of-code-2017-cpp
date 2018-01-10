@@ -1,10 +1,7 @@
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <regex>
-#include <sstream>
-#include <string>
 #include <vector>
 
 #define TEST 0
@@ -169,10 +166,7 @@ std::vector<std::string> IteratePattern(std::vector<std::string> pattern, std::m
 					part.push_back(pattern[j * 2].substr(k * 2, 2));
 					part.push_back(pattern[(j * 2) + 1].substr(k * 2, 2));
 					input = Join(part, "/");
-					if (variants.find(input) == variants.end()) {
-						// problem ???
-						int z = 78;
-					} else {
+					if (variants.find(input) != variants.end()) {
 						input = variants[input];
 						new_pattern[3 * j].append(rules[input][0]);
 						new_pattern[(3 * j) + 1].append(rules[input][1]);
@@ -192,10 +186,7 @@ std::vector<std::string> IteratePattern(std::vector<std::string> pattern, std::m
 					part.push_back(pattern[(j * 3) + 1].substr(k * 3, 3));
 					part.push_back(pattern[(j * 3) + 2].substr(k * 3, 3));
 					input = Join(part, "/");
-					if (variants.find(input) == variants.end()) {
-						// problem ???
-						int z = 78;
-					} else {
+					if (variants.find(input) != variants.end()) {
 						input = variants[input];
 						new_pattern[4 * j].append(rules[input][0]);
 						new_pattern[(4 * j) + 1].append(rules[input][1]);
@@ -204,11 +195,7 @@ std::vector<std::string> IteratePattern(std::vector<std::string> pattern, std::m
 					}
 				}
 			}
-		} else {
-			// problem???
-			int z = 13;
 		}
-
 		pattern = new_pattern;
 	}
 
@@ -230,7 +217,7 @@ int main(void) {
 	std::map<std::string, std::string> variants;
 	std::cout << "=== Advent of Code 2017 - day 21 ====" << std::endl;
 	std::cout << "--- part 1 ---" << std::endl;
-	std::vector<std::string> pattern, tt;
+	std::vector<std::string> pattern;
 
 #if TEST
 	input.open("input-test.txt", std::ifstream::in);

@@ -1,12 +1,8 @@
-#include <algorithm>
 #include <fstream>
-#include <iomanip>
 #include <iostream>
-#include <sstream>
-#include <string>
 #include <vector>
 
-// hexagon grids implemntation theory ...
+// hexagon grids implementation theory ...
 // https://www.redblobgames.com/grids/hexagons/
 
 typedef enum { N, S, NE, NW, SE, SW } HexWay;

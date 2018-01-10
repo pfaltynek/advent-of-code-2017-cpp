@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#define TEST 1
+#define TEST 0
 
 void AnalyzeStream(std::string stream, int &groups_score, int &garbage_chars, int &groups) {
 	bool ignore = false, garbage = false;
@@ -43,9 +43,6 @@ void AnalyzeStream(std::string stream, int &groups_score, int &garbage_chars, in
 						groups++;
 						groups_score += group_deep;
 						group_deep--;
-					} else {
-						// shit
-						int x = 11;
 					}
 				} else {
 					garbage_chars++;

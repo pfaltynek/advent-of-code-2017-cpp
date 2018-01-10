@@ -1,10 +1,7 @@
-#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <regex>
-#include <sstream>
-#include <string>
 #include <vector>
 
 std::regex set_template1("^set ([a-z]) (-?\\d+)$");

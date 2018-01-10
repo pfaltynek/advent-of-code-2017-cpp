@@ -1,12 +1,10 @@
 #include <algorithm>
-#include <climits>
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string>
 #include <vector>
 
-#define TEST 1
+#define TEST 0
 
 bool IsPassWordValidPart1(std::vector<std::string> passwords) {
 	for (int i = 0; i < passwords.size(); i++) {
